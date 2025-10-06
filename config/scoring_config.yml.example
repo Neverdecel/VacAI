@@ -1,0 +1,137 @@
+# VACAI Scoring Configuration
+# Copy this file to scoring_config.yml and customize for your job search
+
+# Scoring weights (must sum to 100)
+weights:
+  skills_match: 30        # How well your skills match the job requirements
+  experience_match: 20    # How well your experience aligns
+  employment_type: 25     # Employment type preference match
+  location: 15            # Location/commute preferences
+  role_level: 10          # Seniority level match
+
+# Location preferences (set enabled: false to disable location scoring)
+location:
+  enabled: true
+  acceptable_locations:
+    - "Remote"
+    - "Hybrid"
+    # Add your preferred cities/locations below:
+    # - "New York"
+    # - "San Francisco"
+    # - "London"
+  max_commute_minutes: 30  # Maximum acceptable commute time
+
+  # Remote work preferences
+  remote_preference: "hybrid"  # Options: remote, hybrid, onsite, any
+
+# Employment type filtering (set enabled: false to disable)
+employment_filter:
+  enabled: true
+
+  # Preferred employment types (in order of preference)
+  preferred_types:
+    - "Full-time"
+    - "Contract"
+
+  # Consultancy/contracting detection (set enabled: false to skip)
+  consultancy_detection:
+    enabled: false  # Disable by default - enable if you want to filter out consultancies
+
+    # Keywords that indicate consultancy/contracting (customize for your market/language)
+    keywords:
+      # English
+      - "consulting"
+      - "consultancy"
+      - "staffing"
+      - "placement"
+      - "contractor"
+
+      # Add keywords for other languages:
+      # Dutch examples:
+      # - "detachering"
+      # - "bij klanten"
+      # - "op locatie bij opdrachtgever"
+
+    # Company name patterns that indicate consultancy
+    company_patterns:
+      - "consulting"
+      - "consultancy"
+      - "solutions"
+      - "staffing"
+      # Add patterns for your market
+
+# Market settings
+market:
+  # Primary country for job search
+  country: "United States"  # Change to your country
+
+  # Supported countries for JobSpy:
+  # - United States
+  # - Canada
+  # - United Kingdom
+  # - Netherlands
+  # - Germany
+  # - France
+  # - Spain
+  # - Italy
+  # And many more...
+
+  # Language for prompts and analysis
+  language: "en"  # en, nl, de, fr, es, etc.
+
+# Role level preferences (customize for your experience)
+role_level:
+  target_levels:
+    - "Senior"
+    - "Lead"
+    - "Staff"
+
+  # Set to true if you're open to management roles
+  open_to_management: false
+
+# Skills configuration
+skills:
+  # Primary skills (highest weight in matching)
+  primary:
+    - "Python"
+    - "Machine Learning"
+    - "API Development"
+
+  # Secondary skills (medium weight)
+  secondary:
+    - "Docker"
+    - "Kubernetes"
+    - "PostgreSQL"
+
+  # Nice-to-have skills (low weight)
+  desired:
+    - "AWS"
+    - "React"
+    - "TypeScript"
+
+# Additional filters
+filters:
+  # Minimum salary (leave empty to disable)
+  min_salary: null
+
+  # Maximum salary (leave empty to disable)
+  max_salary: null
+
+  # Company size preferences (leave empty to disable)
+  company_size:
+    - "Startup"
+    - "Scaleup"
+    - "Enterprise"
+
+  # Industries to focus on (leave empty for all)
+  industries: []
+    # - "Technology"
+    # - "Finance"
+    # - "Healthcare"
+
+# Scoring thresholds
+thresholds:
+  excellent: 80   # Score >= 80 is excellent match
+  good: 60        # Score >= 60 is good match
+  acceptable: 40  # Score >= 40 is acceptable
+  # Below 40 is considered poor match
