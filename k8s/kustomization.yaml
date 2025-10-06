@@ -1,0 +1,50 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: vacai
+
+resources:
+  - namespace.yaml
+  - secret.yaml
+  - configmap.yaml
+  - pvc.yaml
+  - cronjob.yaml
+  # Uncomment to run initial setup job
+  # - job-init.yaml
+
+# Common labels applied to all resources
+commonLabels:
+  app: vacai
+  managed-by: kustomize
+
+# Image configuration
+# Replace Neverdecel with your GitHub username
+images:
+  - name: ghcr.io/Neverdecel/vacai
+    newTag: latest
+
+# ConfigMap generator (alternative to configmap.yaml)
+# configMapGenerator:
+#   - name: vacai-config
+#     literals:
+#       - OPENAI_MODEL=gpt-4o-mini
+#       - DATABASE_PATH=/app/data/vacai.db
+#       - MAX_JOBS_PER_SCAN=100
+#       - PYTHONUNBUFFERED=1
+
+# Secret generator (alternative to secret.yaml - not recommended for production)
+# secretGenerator:
+#   - name: vacai-secrets
+#     literals:
+#       - OPENAI_API_KEY=your_key_here
+
+# Patches
+patches:
+  # Example: Override image tag per environment
+  # - target:
+  #     kind: CronJob
+  #     name: vacai-daily-scan
+  #   patch: |-
+  #     - op: replace
+  #       path: /spec/jobTemplate/spec/template/spec/containers/0/image
+  #       value: ghcr.io/Neverdecel/vacai:v1.0.0

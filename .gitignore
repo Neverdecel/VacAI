@@ -1,0 +1,70 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+
+# Database (contains personal data)
+*.db
+*.sqlite
+*.db-journal
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Generated config files (contain personal data)
+config/search_preferences.yml
+config/resume_profile.json
+
+# Personal data
+resume/*.pdf
+resume/*.txt
+resume/*.md
+!resume/README.md
+
+# Reports (may contain personal job search data)
+reports/
+logs/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/

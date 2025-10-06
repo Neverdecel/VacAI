@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  vacai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Replace Neverdecel with your actual GitHub username
+    image: ghcr.io/Neverdecel/vacai:latest
+    container_name: vacai
+    restart: unless-stopped
+
+    environment:
+      # OpenAI Configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4o-mini}
+
+      # Telegram Configuration (optional)
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+
+      # Database
+      - DATABASE_PATH=/app/data/vacai.db
+
+      # Python
+      - PYTHONUNBUFFERED=1
+
+    volumes:
+      # Persistent data
+      - ./data:/app/data
+      - ./reports:/app/reports
+      - ./logs:/app/logs
+
+      # Configuration files
+      - ./config:/app/config
+      - ./.env:/app/.env:ro
+
+      # Resume directory
+      - ./resume:/app/resume:ro
+
+    # Override default command for different use cases
+    # Uncomment one of the following:
+
+    # Interactive CLI mode (default)
+    command: ["python", "main.py", "--help"]
+
+    # Run a scan immediately
+    # command: ["python", "main.py", "scan"]
+
+    # Generate a report
+    # command: ["python", "main.py", "report"]
+
+    # Keep container running for manual commands
+    # command: ["tail", "-f", "/dev/null"]
+
+    networks:
+      - vacai-network
+
+    labels:
+      - "com.vacai.description=AI-Powered Job Search Automation"
+      - "com.vacai.version=0.1.0"
+
+networks:
+  vacai-network:
+    driver: bridge

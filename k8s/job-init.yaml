@@ -1,0 +1,87 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: vacai-init
+  namespace: vacai
+spec:
+  backoffLimit: 2
+  template:
+    metadata:
+      labels:
+        app: vacai
+        component: init
+    spec:
+      restartPolicy: OnFailure
+      imagePullSecrets:
+        - name: ghcr-secret  # Your existing GHCR pull secret
+      containers:
+        - name: vacai-init
+          # Replace Neverdecel with your GitHub username
+          image: ghcr.io/Neverdecel/vacai:latest
+          imagePullPolicy: Always
+          command:
+            - /bin/bash
+            - -c
+            - |
+              echo "=== VacAI Initialization ==="
+
+              # Check if resume file exists
+              if [ ! -f /app/resume/resume.pdf ]; then
+                echo "ERROR: No resume file found at /app/resume/resume.pdf"
+                echo "Please add your resume to the PVC before running this job"
+                exit 1
+              fi
+
+              # Initialize with resume
+              echo "Initializing VacAI with resume..."
+              python main.py init --resume /app/resume/resume.pdf
+
+              # Run initial scan
+              echo "Running initial job scan..."
+              python main.py scan
+
+              echo "=== Initialization Complete ==="
+          envFrom:
+            - configMapRef:
+                name: vacai-config
+            - secretRef:
+                name: vacai-secrets
+          volumeMounts:
+            - name: data
+              mountPath: /app/data
+            - name: reports
+              mountPath: /app/reports
+            - name: config
+              mountPath: /app/config
+            - name: resume
+              mountPath: /app/resume
+              readOnly: true
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: vacai-data
+        - name: reports
+          persistentVolumeClaim:
+            claimName: vacai-reports
+        - name: config
+          persistentVolumeClaim:
+            claimName: vacai-config
+        - name: resume
+          # Mount your resume here - adjust based on your setup
+          # Option 1: From a ConfigMap
+          configMap:
+            name: vacai-resume
+          # Option 2: From a PVC
+          # persistentVolumeClaim:
+          #   claimName: vacai-resume
+          # Option 3: From a host path (not recommended for production)
+          # hostPath:
+          #   path: /path/to/resume
+          #   type: File

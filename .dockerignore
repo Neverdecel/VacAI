@@ -1,0 +1,59 @@
+# Git
+.git
+.gitignore
+.github
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.*
+
+# Database
+*.db
+*.sqlite
+
+# Generated files
+config/search_preferences.yml
+config/resume_profile.json
+
+# Reports and logs
+reports/
+logs/
+*.log
+
+# Documentation (except essential)
+*.md
+!README.md
+
+# Test files
+tests/
+test_*.py
+
+# Resume files (should be mounted as volume)
+resume/
+
+# CI/CD
+.github/
+
+# Misc
+*.bak
+*.tmp
+.DS_Store

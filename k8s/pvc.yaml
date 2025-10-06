@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vacai-data
+  namespace: vacai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+  # Adjust storage class based on your k3s setup
+  # storageClassName: local-path  # Default k3s storage class
+  # storageClassName: longhorn    # If using Longhorn
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vacai-reports
+  namespace: vacai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vacai-config
+  namespace: vacai
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi

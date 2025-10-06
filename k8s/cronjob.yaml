@@ -1,0 +1,104 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vacai-daily-scan
+  namespace: vacai
+spec:
+  # Run daily at 9 AM UTC (adjust timezone as needed)
+  schedule: "0 9 * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 3600  # 1 hour timeout
+      template:
+        metadata:
+          labels:
+            app: vacai
+            component: cronjob
+        spec:
+          restartPolicy: OnFailure
+          imagePullSecrets:
+            - name: ghcr-secret  # Your existing GHCR pull secret
+          containers:
+            - name: vacai-scanner
+              # Replace Neverdecel with your GitHub username
+              image: ghcr.io/Neverdecel/vacai:latest
+              imagePullPolicy: Always
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  echo "=== Starting VacAI Daily Scan ==="
+                  date
+
+                  # Run job scan
+                  echo "Running job scan..."
+                  python main.py scan
+
+                  # Generate report
+                  echo "Generating report..."
+                  python -c "
+                  from src.database.manager import DatabaseManager
+                  from src.cli.report_generator import generate_daily_report
+
+                  db = DatabaseManager()
+                  output_file, strong_count, potential_count = generate_daily_report(db)
+                  print(f'Daily report generated: {output_file}')
+                  print(f'  - Strong matches: {strong_count}')
+                  print(f'  - Potential matches: {potential_count}')
+                  "
+
+                  # Send Telegram notification if configured
+                  if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+                    echo "Sending Telegram notification..."
+                    python -c "
+                  import os
+                  from src.database.manager import DatabaseManager
+                  from src.notifier.telegram_notifier import send_daily_report_sync
+
+                  db = DatabaseManager()
+                  new_jobs = db.get_jobs_last_24h()
+                  strong_matches = [j for j in new_jobs if j.overall_score and j.overall_score >= 80]
+                  potential_matches = [j for j in new_jobs if j.overall_score and 60 <= j.overall_score < 80]
+
+                  send_daily_report_sync(strong_matches, potential_matches, len(new_jobs))
+                  print(f'Telegram report sent - Strong: {len(strong_matches)}, Potential: {len(potential_matches)}')
+                  "
+                  else
+                    echo "Telegram not configured (skipping notification)"
+                  fi
+
+                  echo "=== Daily Scan Complete ==="
+                  date
+              envFrom:
+                - configMapRef:
+                    name: vacai-config
+                - secretRef:
+                    name: vacai-secrets
+              volumeMounts:
+                - name: data
+                  mountPath: /app/data
+                - name: reports
+                  mountPath: /app/reports
+                - name: config
+                  mountPath: /app/config
+              resources:
+                requests:
+                  memory: "512Mi"
+                  cpu: "250m"
+                limits:
+                  memory: "2Gi"
+                  cpu: "1000m"
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: vacai-data
+            - name: reports
+              persistentVolumeClaim:
+                claimName: vacai-reports
+            - name: config
+              persistentVolumeClaim:
+                claimName: vacai-config

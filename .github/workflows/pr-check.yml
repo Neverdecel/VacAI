@@ -1,0 +1,65 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  lint-and-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8 black isort
+
+      - name: Run Black (code formatting check)
+        run: black --check src/ main.py || true
+        continue-on-error: true
+
+      - name: Run isort (import sorting check)
+        run: isort --check-only src/ main.py || true
+        continue-on-error: true
+
+      - name: Run Flake8 (linting)
+        run: flake8 src/ main.py --max-line-length=120 --ignore=E501,W503 || true
+        continue-on-error: true
+
+  docker-build-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image (test only)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: vacai:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Test Docker image
+        run: |
+          docker run --rm vacai:test python --version
+          docker run --rm vacai:test python -c "from src.cli.commands import cli; print('CLI import successful')"

@@ -1,0 +1,38 @@
+# This file will be auto-generated from your resume
+# Example structure:
+
+personal_profile:
+  name: "Your Name"
+  current_role: "Software Engineer"
+  experience_years: 5
+  key_skills:
+    - Python
+    - Machine Learning
+    - Docker
+  preferred_roles:
+    - Senior Software Engineer
+    - ML Engineer
+
+job_search_criteria:
+  search_terms:
+    - "Senior Software Engineer"
+    - "Machine Learning Engineer"
+  locations:
+    - "Remote"
+    - "San Francisco, CA"
+  remote_only: true
+  job_types:
+    - fulltime
+    - contract
+  salary_min: 120000
+  results_wanted: 50
+  hours_old: 72  # Only jobs posted in last 3 days
+
+matching_preferences:
+  must_have_skills:
+    - Python
+  nice_to_have_skills:
+    - AWS
+    - Kubernetes
+  company_size_preference: null  # startup, mid, enterprise
+  industry_preference: null
